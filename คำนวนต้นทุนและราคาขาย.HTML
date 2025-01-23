@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การคำนวณราคาขาย</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #6e7dff, #ff7f7f);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 700px;
+            color: #333;
+        }
+        h2 {
+            color: #333;
+        }
+        label, input, button {
+            display: block;
+            margin: 5px auto;
+        }
+        input {
+            padding: 4px;
+            width: 120px;
+        }
+        button {
+            padding: 6px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 3px;
+            font-size: 10px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #f1f1f1;
+        }
+        .buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        .buttons button {
+            padding: 6px 10px;
+            background-color: #007bff;
+            font-size: 10px;
+        }
+        .buttons button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- คำนวณต้นทุนง่ายๆ -->
+    <div class="section">
+        <h2>คำนวณต้นทุนง่ายๆ</h2>
+        <table class="table" id="costTable">
+            <thead>
+                <tr>
+                    <th>ส่วนผสม</th>
+                    <th>หน่วย</th>
+                    <th>ปริมาณ</th>
+                    <th>ราคาต่อบรรจุภัณฑ์</th>
+                    <th>ต้นทุนต่อวัตถุดิบ</th>
+                    <th>ลบ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="วัตถุดิบ #1"></td>
+                    <td><input type="text" placeholder="หน่วย"></td>
+                    <td><input type="number" value="100"></td>
+                    <td><input type="number" value="100"></td>
+                    <td>10.00</td>
+                    <td><button style="background-color: #dc3545; color: white;" onclick="removeRow(this)">ลบ</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="buttons">
+            <button onclick="addRow()">เพิ่มส่วนผสม</button>
+            <button onclick="calculateCost()">คำนวณต้นทุน</button>
+        </div>
+        <p style="text-align: center;">ต้นทุนรวม: <strong id="totalCost">0.00</strong> บาท</p>
+    </div>
+
+    <!-- คำนวณราคาขาย -->
+    <h2>คำนวณราคาขาย</h2>
+    <label for="cost">ต้นทุน (บาท):</label>
+    <input type="number" id="cost" placeholder="กรอกต้นทุน">
+
+    <label for="profit">ต้องการกำไร (%) :</label>
+    <input type="number" id="profit" placeholder="กรอก % กำไร">
+
+    <button onclick="calculatePrice()">คำนวณราคาขาย</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    function addRow() {
+        const table = document.getElementById("costTable").getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        
+        const cell1 = newRow.insertCell(0);
+        const cell2 = newRow.insertCell(1);
+        const cell3 = newRow.insertCell(2);
+        const cell4 = newRow.insertCell(3);
+        const cell5 = newRow.insertCell(4);
+        const cell6 = newRow.insertCell(5);
+
+        cell1.innerHTML = `<input type="text" placeholder="วัตถุดิบ">`;
+        cell2.innerHTML = `<input type="text" placeholder="หน่วย">`;
+        cell3.innerHTML = `<input type="number" value="100">`;
+        cell4.innerHTML = `<input type="number" value="100">`;
+        cell5.innerHTML = `10.00`;
+        cell6.innerHTML = `<button style="background-color: #dc3545; color: white;" onclick="removeRow(this)">ลบ</button>`;
+    }
+
+    function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.remove();
+        calculateCost();  // Recalculate cost after removing a row
+    }
+
+    function calculateCost() {
+        let totalCost = 0;
+        const rows = document.getElementById("costTable").getElementsByTagName('tbody')[0].rows;
+
+        for (let i = 0; i < rows.length; i++) {
+            const quantity = parseFloat(rows[i].cells[2].getElementsByTagName('input')[0].value);
+            const pricePerUnit = parseFloat(rows[i].cells[3].getElementsByTagName('input')[0].value);
+            totalCost += quantity * pricePerUnit;
+        }
+
+        document.getElementById("totalCost").innerText = totalCost.toFixed(2);
+    }
+
+    function calculatePrice() {
+        const cost = parseFloat(document.getElementById('cost').value);
+        const profit = parseFloat(document.getElementById('profit').value);
+
+        if (isNaN(cost) || isNaN(profit) || cost <= 0 || profit < 0) {
+            document.getElementById('result').innerText = "กรุณากรอกข้อมูลให้ถูกต้อง";
+            return;
+        }
+
+        const sellingPrice = cost / (1 - (profit / 100));
+        document.getElementById('result').innerText = `ราคาขายที่ควรตั้งคือ ${sellingPrice.toFixed(2)} บาท`;
+    }
+</script>
+
+</body>
+</html>
